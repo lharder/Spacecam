@@ -1,0 +1,53 @@
+go.property( "tilewidth", 800 )
+go.property( "tileheight", 800 )
+
+
+function init( self )
+	local position = go.get_position()
+	position.z = 0.1
+	go.set_position( position )
+
+	self.player = nil
+end
+
+
+
+function update( self, dt )
+	if self.player ~= nil then
+
+		local playerPos = go.get_position( self.player );
+		local bgPos = go.get_position();
+		pprint( "player pos: " .. tostring( playerPos ) .. ",   " .. "bg pos: " .. tostring( bgPos ) )
+		
+		if( playerPos.x <= bgPos.x - self.tilewidth  ) then
+			bgPos.x = playerPos.x;
+			go.set_position( bgPos )
+			
+		elseif( playerPos.x >= bgPos.x + self.tilewidth  ) then
+			bgPos.x = playerPos.x;
+			go.set_position( bgPos )
+			
+		end
+
+		if( playerPos.y <= bgPos.y - self.tileheight  ) then
+			bgPos.y = playerPos.y;
+			go.set_position( bgPos )
+			
+		elseif( playerPos.y >= bgPos.y + self.tileheight  ) then
+			bgPos.y = playerPos.y;
+			go.set_position( bgPos )
+			
+		end
+	end
+end
+
+
+
+function on_message( self, message_id, message, sender )
+	if message_id == hash( "setup" ) then
+		if( message.player ) then
+			self.player = message.player
+		end
+	end
+end
+

@@ -1,0 +1,106 @@
+
+go.property( "aspect_ratio", 1.0 )
+go.property( "fov", 0.785 )	--	45 degrees (45 * PI / 180)
+go.property( "near_z", 0.1 )
+go.property( "far_z", 1000 )
+go.property( "auto_aspect_ratio", 0 )
+
+go.property( "enabled", 1 )
+
+
+
+local default_aspect_ratio = tonumber(sys.get_config("display.width")) / tonumber(sys.get_config("display.height"))
+local halfScreenWidth = tonumber( sys.get_config( "display.width" ) ) / 2
+local halfScreenHeight = tonumber( sys.get_config( "display.height" ) ) / 2
+local xUnit = 3.333334;  -- 300 pixels / 90 degrees
+local yUnit = 2.222223;  -- 200 pixels / 90 degrees
+local delta = vmath.vector3( 0, 0, 0 )
+
+
+
+function init( self )
+	self.player = nil
+	
+	msg.post( ".", "acquire_camera_focus" )
+	pprint( "focus aquired!" )
+end
+
+
+function update( self, dt )
+	if self.enabled == 1 and self.player ~= nil then
+		
+		local aspect_ratio = ( self.auto_aspect_ratio == 1 ) and default_aspect_ratio or self.aspect_ratio 
+		local projection = vmath.matrix4_perspective( self.fov, aspect_ratio, self.near_z, self.far_z )
+
+		local pos = go.get_world_position( self.player );
+		local target = getCameraPosOffsets( self );
+
+		-- pprint( "player pos: " .. tostring( pos ) .. ",   " .. "target pos: " .. tostring( target ) )
+
+		if( delta.x < target.x ) then delta.x = delta.x + 3;  end
+		if( delta.x > target.x ) then delta.x = delta.x - 3;  end
+		if( delta.y < target.y ) then delta.y = delta.y + 3;  end
+		if( delta.y > target.y ) then delta.y = delta.y - 3;  end
+		pos.x = pos.x + delta.x - halfScreenWidth
+		pos.y = pos.y + delta.y - halfScreenHeight
+		
+		local rot = go.get_world_rotation()
+
+		local look_at = pos + vmath.rotate( rot, vmath.vector3( 0, 0, -1.0 ) )
+		local up = vmath.rotate( rot, vmath.vector3( 0, 1.0, 0 ) )
+		local view = vmath.matrix4_look_at( pos, look_at, up )
+
+		msg.post( "@render:", "set_view_projection", { id = go.get_id(), view = view, projection = projection } )
+	end
+end
+
+
+
+function getCameraPosOffsets( self ) 
+	local offset = vmath.vector3( 0, 0, 0 )
+
+	local lookAtAngle = getRotationDegrees( self.player ) 
+	if( lookAtAngle == 360 ) then lookAtAngle = 0 end
+	
+	if ( lookAtAngle >= 0 ) and ( lookAtAngle <= 90 ) then
+		offset.x = ( lookAtAngle % 90 ) * xUnit;
+		offset.y = -1 * ( lookAtAngle % 90 ) * yUnit + 200;
+	elseif( lookAtAngle > 90 ) and ( lookAtAngle <= 180 ) then
+		offset.x = -1 * ( lookAtAngle % 90 ) * xUnit + 300;
+		offset.y = -1 * ( lookAtAngle % 90 ) * yUnit;
+	elseif( lookAtAngle > 180 ) and ( lookAtAngle <= 270 ) then
+		offset.x = -1 * ( lookAtAngle % 90 ) * xUnit;
+		offset.y = ( lookAtAngle % 90 ) * yUnit - 200;
+	elseif( lookAtAngle > 270 ) and ( lookAtAngle < 360 ) then
+		offset.x = ( lookAtAngle % 90 ) * xUnit - 300;
+		offset.y = ( lookAtAngle % 90 ) * yUnit;
+	end
+	
+	return offset
+end
+
+
+-- return the rotation angle of a gameobject in degrees
+function getRotationDegrees( goPath )
+	local rot = go.get( goPath, "euler" )
+	if( rot.z < 0 ) then rot.z = rot.z + 360 end
+	rot.z = 360 - rot.z
+
+	return rot.z;
+end
+
+
+
+function on_message( self, message_id, message, sender )
+	if message_id == hash( "enable" ) then
+		self.enabled = 1
+		
+	elseif message_id == hash( "disable" ) then
+		self.enabled = 0
+		
+	elseif message_id == hash( "setup" ) then
+		if( message.player ) then
+			self.player = message.player
+		end
+	end
+end
