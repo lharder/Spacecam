@@ -22,8 +22,8 @@ To use the spacecam in one of your own Defold projects:
 require( "spacecam.Spacecam" )
 
 function init( self )
-	-- provide the gameobjects' ids you have set up in your editor
-	Spacecam.setup( "/player", "/camera", "/background" )
+  -- provide the gameobjects' ids you have set up in your editor
+  Spacecam.setup( "/player", "/camera", "/background" )
 end
 ```
 
