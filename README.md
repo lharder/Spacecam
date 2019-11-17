@@ -27,4 +27,8 @@ function init( self )
 end
 ```
 
+## Example ##
+
+You can see a working example for the spacecam's setup under the main folder: download the project, open it in the Defold editor and you will see the word "Player" moving around through space when you touch the screen.
+
 After that, you are good to go.
