@@ -17,7 +17,7 @@ function update( self, dt )
 
 		local playerPos = go.get_position( self.player );
 		local bgPos = go.get_position();
-		pprint( "player pos: " .. tostring( playerPos ) .. ",   " .. "bg pos: " .. tostring( bgPos ) )
+		-- pprint( "player pos: " .. tostring( playerPos ) .. ",   " .. "bg pos: " .. tostring( bgPos ) )
 		
 		if( playerPos.x <= bgPos.x - self.tilewidth  ) then
 			bgPos.x = playerPos.x;

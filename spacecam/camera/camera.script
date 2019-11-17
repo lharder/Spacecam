@@ -51,6 +51,7 @@ function update( self, dt )
 		local view = vmath.matrix4_look_at( pos, look_at, up )
 
 		msg.post( "@render:", "set_view_projection", { id = go.get_id(), view = view, projection = projection } )
+		go.set_position( pos )
 	end
 end
 
