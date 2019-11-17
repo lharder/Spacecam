@@ -4,11 +4,11 @@ Spacecam is an endlessly scrolling camera for use with the Defold game engine: i
 
 Besides, the camera takes into account to which direction the player is moving: depending on the rotation angle, the camera keeps most of the visible screen area "in front" of the player. That allows for better reaction time for the player, assuming that the major part of the action takes place ahead of his flight direction, not behind.
 
-###Status###
+## Status ##
 
 This code is on a "works-for-me" basis - no guarantees for anything. Use at your own risk.
 
-###Usage###
+## Usage ##
 
 To use the spacecam in one of your own Defold projects:
 
